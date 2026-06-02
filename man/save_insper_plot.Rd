@@ -39,6 +39,10 @@ Passed to \code{\link[ggplot2]{ggsave}}.}
 
 \item{...}{Additional arguments passed to ggsave}
 }
+\value{
+The file path of the saved plot (invisibly), as returned by
+  \code{\link[ggplot2]{ggsave}}.
+}
 \description{
 Enhanced ggsave with institutional defaults and ragg device support
 }
@@ -47,13 +51,20 @@ This function automatically uses the ragg device for PNG output when available,
 which provides better font rendering and eliminates DPI issues. Install the
 \pkg{ragg} package and set the RStudio backend to AGG for best results.
 }
+\examples{
+\dontrun{
+p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+  ggplot2::geom_point() +
+  theme_insper()
+save_insper_plot(p, tempfile(fileext = ".png"))
+}
+
+}
 \seealso{
 \code{\link[ggplot2]{ggsave}}
 
 Other utilities: 
 \code{\link{format_num_br}()},
-\code{\link{has_insper_fonts}()},
-\code{\link{import_insper_fonts}()},
-\code{\link{setup_insper_fonts}()}
+\code{\link{has_insper_fonts}()}
 }
 \concept{utilities}

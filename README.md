@@ -19,7 +19,13 @@ institution dedicated to teaching and research.
 
 ## Installation
 
-You can install the development version of insperplot from GitHub:
+Install insperplot from CRAN:
+
+``` r
+install.packages("insperplot")
+```
+
+Or install the development version from GitHub:
 
 ``` r
 # install.packages("remotes")
@@ -108,39 +114,27 @@ show_insper_palette()
 - `show_insper_palette()`: Visualize available color palettes.
 - `insper_*()`: Specialized plotting functions.
 
-## Using ragg and Insper Fonts (Recommended)
+## Fonts and Rendering
 
-For the best results with `insperplot`, we recommend installing the
-**Inter** typography font from Google Fonts.
+`insperplot` bundles the **Inter**, **EB Garamond**, and **Playfair
+Display** font families (all licensed under the SIL Open Font License).
+These fonts are registered automatically when the package is loaded —
+no manual download or setup required.
 
-**Step 1: Install Insper Fonts**
+The default title font is **Georgia**, a system serif font
+pre-installed on most operating systems. If Georgia is unavailable, the
+theme falls back to the bundled serif fonts.
 
-`insperplot` uses fonts based on Insper’s official template. We include
-EB Garamond and Playfair Display as fallbacks for Georgia, though
-Georgia is typically pre-installed in most systems.
-
-- **Georgia** (serif, primary for titles) - typically pre-installed
-- **Inter** (sans-serif, for body text) - Google Font
-- \[Optional\] **EB Garamond** & **Playfair Display** (serif, title
-  fallbacks).
-
-To use these fonts, visit [Google Fonts](https://fonts.google.com) and
-download and install “Inter”, “EB Garamond”, and “Playfair Display”.
-
-**Step 2: Install ragg Graphics Device**
+For the best rendering quality, install the
+[ragg](https://ragg.r-lib.org/) graphics device:
 
 ``` r
-install.packages("ragg")
+install.packages(“ragg”)
 ```
 
-**Step 3: Configure RStudio (if using RStudio)**
-
-- Go to: **Tools \> Global Options \> General \> Graphics**
-- Set **Backend** to **AGG**
-- Restart R session
-
-**Note:** Positron users can skip this step since it uses ragg by
-default.
+If you use **RStudio**, set the graphics backend to AGG: **Tools \>
+Global Options \> General \> Graphics \> Backend \> AGG**. **Positron**
+users can skip this step since it uses ragg by default.
 
 ## Documentation
 

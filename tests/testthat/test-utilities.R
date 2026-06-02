@@ -217,39 +217,19 @@ test_that("save_insper_plot handles different DPI values", {
 })
 
 
-# Tests for import_insper_fonts() ----
+# Tests for bundled font registration ----
 
-test_that("import_insper_fonts returns named logical vector", {
-  result <- import_insper_fonts(verbose = FALSE)
-  expect_type(result, "logical")
-  expect_named(result)
-  expect_true(all(names(result) %in% c("Inter", "EB Garamond", "Playfair Display")))
+test_that("bundled fonts are registered on package load", {
+  registered <- systemfonts::registry_fonts()$family
+  system <- systemfonts::system_fonts()$family
+  all_fonts <- unique(c(registered, system))
+
+  expect_true("Inter" %in% all_fonts)
+  expect_true("EB Garamond" %in% all_fonts)
+  expect_true("Playfair Display" %in% all_fonts)
 })
 
-test_that("import_insper_fonts verbose=FALSE suppresses messages", {
-  expect_silent(import_insper_fonts(verbose = FALSE))
-})
-
-test_that("import_insper_fonts skips already-installed fonts", {
-  skip_if_not_installed("systemfonts")
-  # Fonts already installed should return FALSE (skipped), not error
-  result <- import_insper_fonts(verbose = FALSE)
-  expect_type(result, "logical")
-  # All results must be TRUE (downloaded) or FALSE (already present)
-  expect_true(all(result %in% c(TRUE, FALSE)))
-})
-
-# Tests for setup_insper_fonts() ----
-
-test_that("setup_insper_fonts returns named logical vector", {
-  result <- setup_insper_fonts(verbose = FALSE)
-
-  expect_type(result, "logical")
-  expect_named(result)
-  expect_true(all(names(result) %in% c("Georgia", "Inter", "EB Garamond", "Playfair Display")))
-  expect_length(result, 4)
-})
-
-test_that("setup_insper_fonts verbose=FALSE suppresses output", {
-  expect_silent(setup_insper_fonts(verbose = FALSE))
+test_that("has_insper_fonts returns logical", {
+  expect_type(has_insper_fonts(), "logical")
+  expect_length(has_insper_fonts(), 1)
 })

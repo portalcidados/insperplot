@@ -42,20 +42,19 @@
 #'   \item Consistent spacing and typography hierarchy
 #' }
 #'
-#' **Font Setup:**
+#' **Fonts:**
 #'
 #' The theme uses fonts based on Insper's official template:
 #' \itemize{
 #'   \item Georgia (serif, system font) for titles - falls back to EB Garamond,
 #'         then Playfair Display
-#'   \item Inter (sans-serif, Google Font) for body text - falls back to Arial
+#'   \item Inter (sans-serif) for body text - falls back to Arial
 #' }
 #'
-#' To install or check fonts, see \code{\link{setup_insper_fonts}} and
-#' \code{\link{import_insper_fonts}}.
-#'
-#' If fonts are unavailable, the theme automatically falls back through the
-#' chain and ultimately to system defaults ("serif" and "sans") without errors.
+#' Inter, EB Garamond, and Playfair Display are bundled with the package and
+#' registered automatically when the package is loaded. Georgia is a system
+#' font available on most operating systems. If any font is unavailable, the
+#' theme falls back through the chain to system defaults ("serif" / "sans").
 #'
 #' The function validates input parameters and will throw an error if invalid
 #' values are provided for \code{grid} or \code{border} arguments.
@@ -84,7 +83,7 @@
 #'   theme_insper(base_size = 11, border = "closed")
 #'
 #' @family themes
-#' @seealso \code{\link[ggplot2]{theme_minimal}}, \code{\link[ggplot2]{theme}}, \code{\link{setup_insper_fonts}}, \code{\link{import_insper_fonts}}
+#' @seealso \code{\link[ggplot2]{theme_minimal}}, \code{\link[ggplot2]{theme}}
 #' @importFrom ggplot2 element_blank element_line element_rect element_text unit theme theme_minimal rel margin %+replace% theme_sub_axis theme_sub_legend theme_sub_panel theme_sub_plot theme_sub_strip
 #' @export
 theme_insper <- function(
@@ -214,15 +213,14 @@ theme_insper <- function(
 #' @keywords internal
 #' @noRd
 detect_font <- function(font_name, fallback_chain = "sans") {
-  if (!requireNamespace("systemfonts", quietly = TRUE)) {
-    return(fallback_chain[length(fallback_chain)])
-  }
-
   tryCatch(
     {
-      available_fonts <- unique(systemfonts::system_fonts()$family)
+      # Check both registered (bundled) and system-installed fonts
+      available_fonts <- unique(c(
+        systemfonts::registry_fonts()$family,
+        systemfonts::system_fonts()$family
+      ))
 
-      # Returns exact match, or first grepl match (handles variants like "Inter 18pt")
       resolve_font <- function(name) {
         if (name %in% available_fonts) return(name)
         matches <- available_fonts[grepl(name, available_fonts, ignore.case = TRUE)]

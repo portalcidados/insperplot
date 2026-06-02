@@ -10,16 +10,20 @@ has_insper_fonts()
 Logical scalar.
 }
 \description{
-Returns \code{TRUE} when the session is interactive and at least one primary
-Insper font (Georgia or Inter) is registered in the system font catalogue.
-Intended for use with \code{@examplesIf} in package documentation.
+Returns \code{TRUE} when the session is interactive. Fonts are always
+available because they are bundled with the package and registered
+automatically on load. The interactive-only guard prevents examples from
+running during \code{R CMD check}, where the graphics device may not
+support custom fonts.
+}
+\examples{
+has_insper_fonts()
+
 }
 \seealso{
 Other utilities: 
 \code{\link{format_num_br}()},
-\code{\link{import_insper_fonts}()},
-\code{\link{save_insper_plot}()},
-\code{\link{setup_insper_fonts}()}
+\code{\link{save_insper_plot}()}
 }
 \concept{utilities}
 \keyword{internal}

@@ -15,7 +15,8 @@ knitr::opts_chunk$set(
   fig.asp = 0.618,
   fig.align = "center",
   warning = FALSE,
-  message = FALSE
+  message = FALSE,
+  eval = rlang::is_installed(c("dplyr", "lubridate", "RcppRoll"))
 )
 ```
 
@@ -36,28 +37,13 @@ library(ggplot2)
 library(dplyr)
 ```
 
-### Font Setup (Optional but Recommended)
+### Fonts
 
-insperplot uses fonts based on Insper's official template: **Georgia** (primary for titles), **Inter** and **Arial** (for body text). **EB Garamond** and **Playfair Display** are used as fallbacks for titles. While optional, installing these fonts significantly enhances plot aesthetics.
+insperplot bundles the **Inter**, **EB Garamond**, and **Playfair Display** font families and registers them automatically when the package is loaded — no manual setup required.
 
-Note: "GT Ultra Fine Bold" is one of the official Insper fonts, but it is not freely available and is not included in the package.
+The default title font is **Georgia** (a system font pre-installed on most operating systems). If Georgia is unavailable, the theme falls back to the bundled serif fonts.
 
-```{r eval=FALSE}
-# Check font status
-setup_insper_fonts()
-
-# Download missing fonts automatically
-import_insper_fonts()
-```
-
-**Manual installation:**
-
-1. Visit [Google Fonts](https://fonts.google.com)
-2. Download "Inter", "EB Garamond", and "Playfair Display"
-3. Install on your system
-4. Restart R/RStudio
-
-Georgia is typically pre-installed on most systems. If fonts are unavailable, plots will use system defaults.
+For the best rendering quality, install the [ragg](https://ragg.r-lib.org/) package (`install.packages("ragg")`) and, if using RStudio, set the graphics backend to AGG under **Tools > Global Options > General > Graphics**.
 
 ## Basic Usage: theme_insper()
 

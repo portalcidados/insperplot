@@ -1,15 +1,17 @@
 # Test Helpers for Font Availability
 
-#' Skip test if Insper fonts are not available
+#' Skip test if Insper fonts are not registered
 #'
-#' This helper function checks if the required Insper fonts are installed
-#' and skips the test if they're not available. This prevents font-related
-#' test failures in CI environments or systems without the fonts installed.
+#' Bundled fonts are registered on package load, so this should rarely skip.
+#' Guards against edge cases in minimal CI environments.
 skip_if_no_fonts <- function() {
-  font_status <- setup_insper_fonts(verbose = FALSE)
+  all_fonts <- unique(c(
+    systemfonts::registry_fonts()$family,
+    systemfonts::system_fonts()$family
+  ))
 
-  if (!all(font_status)) {
-    testthat::skip("Insper fonts not available (Georgia, Inter, EB Garamond, or Playfair Display missing)")
+  if (!all(c("Inter", "EB Garamond", "Playfair Display") %in% all_fonts)) {
+    testthat::skip("Bundled Insper fonts not registered")
   }
 }
 

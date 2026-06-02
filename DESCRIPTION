@@ -1,8 +1,8 @@
 Package: insperplot
 Type: Package
-Title: Insper Themed ggplot2 Extensions
+Title: Insper Themed 'ggplot2' Extensions
 Version: 0.1.0
-Date: 2025-10-29
+Date: 2026-06-02
 Authors@R: c(
     person(
       "Vinicius", "Oike",
@@ -10,9 +10,13 @@ Authors@R: c(
       role = c("aut", "cre", "cph")
     )
   )
-Description: Extends ggplot2 with Insper's identity, providing custom themes,
-    color palettes, and specialized plotting functions for academic and
-    institutional use.
+Description: Extends 'ggplot2' with the visual identity of Insper Instituto de
+    Ensino e Pesquisa, a Brazilian non-profit institution dedicated to teaching
+    and research. Provides custom themes, color palettes, discrete and
+    continuous scales, and high-level plotting functions for producing
+    publication-ready charts with consistent institutional branding. All plot
+    functions return standard 'ggplot2' objects that can be further customized
+    with additional layers.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -23,9 +27,9 @@ Imports:
     cli,
     ggplot2 (>= 4.0.0),
     rlang (>= 1.0.0),
-    scales (>= 1.2.0)
+    scales (>= 1.2.0),
+    systemfonts
 Suggests:
-    systemfonts,
     ragg,
     testthat (>= 3.0.0),
     vdiffr (>= 1.0.0),

@@ -54,7 +54,7 @@ This package follows **modern R development best practices** (2025 standards):
 - Native pipe `|>` throughout (NOT magrittr `%>%`)
 - Modern tidyverse patterns (dplyr 1.1+ with `.by`, `reframe()`, `pick()`)
 - Modern rlang patterns (embrace `{{}}`, injection `!!`, splicing `!!!`)
-- Font handling via `systemfonts + ragg` (NOT showtext/extrafont due to DPI conflicts)
+- Bundled fonts via `systemfonts::register_font()` in `.onLoad()` (NOT showtext/extrafont due to DPI conflicts)
 
 ### Key R Files Structure
 
@@ -63,9 +63,9 @@ This package follows **modern R development best practices** (2025 standards):
 - `R/palette-utils.R` — exported `insper_palette()`, `show_insper_palettes()`, and internal `get_insper_colors()`, `palette_metadata()`
 - `R/insper_palette.R` — internal `insper_pal()` helper used by scales
 - `R/scales.R` — `scale_color_insper_{c,d}()` / `scale_fill_insper_{c,d}()` (+ `colour` aliases)
-- `R/utils.R` — `save_insper_plot()`, `format_num_br()`, `import_insper_fonts()`, `setup_insper_fonts()`, plus internal helpers: `detect_aesthetic_type()`, `warn_palette_ignored()`, `calculate_luminance()`, `get_contrast_text_color()`, `has_insper_fonts()`, `is_valid_color()`
+- `R/utils.R` — `save_insper_plot()`, `format_num_br()`, plus internal helpers: `detect_aesthetic_type()`, `warn_palette_ignored()`, `calculate_luminance()`, `get_contrast_text_color()`, `has_insper_fonts()`, `is_valid_color()`
 - `R/data.R` — dataset documentation; data lives in `data/` and `R/sysdata.rda`
-- `R/zzz.R` — `.onAttach()` startup message only (no font auto-import)
+- `R/zzz.R` — `.onLoad()` registers bundled fonts (Inter, EB Garamond, Playfair Display) via `systemfonts::register_font()`
 - `R/globals.R` — `utils::globalVariables()` declarations
 
 ## Development Guidelines
@@ -103,7 +103,7 @@ This package follows **modern R development best practices** (2025 standards):
 ### Documentation Requirements
 - All exported functions must have roxygen2 documentation
 - Include `@family` tag (themes, colors, scales, plots, utilities)
-- Include `@examples` with all exported functions. If examples have dependencies, like custom fonts, use `@examplesIf has_insper_fonts()` to avoid errors. If examples might break things use `\dontrun{}` to avoid errors (e.g. `setup_insper_fonts()`).
+- Include `@examples` with all exported functions. Use `@examplesIf has_insper_fonts()` for examples that render plots with custom fonts (guards against non-interactive CMD check). Use `\dontrun{}` for examples with side effects.
 - Use `@param` with `<[data-masked]>` for rlang functions
 - Include `@seealso` cross-references
 
@@ -168,11 +168,12 @@ Rscript data-raw/create_logo.R
 
 ## Important Constraints and Gotchas
 
-### Font-Related Issues
-- Font setup is the #1 user pain point - setup wizard helps
-- Never assume fonts are installed - always use fallback chains
-- Test theme functions without fonts installed (use system defaults)
-- `import_insper_fonts()` must be called each session (not persistent)
+### Bundled Fonts (inst/fonts/)
+- Inter, EB Garamond, and Playfair Display are shipped as TTF files in `inst/fonts/` (OFL-licensed)
+- Registered automatically in `.onLoad()` via `systemfonts::register_font()` — no user action needed
+- `detect_font()` checks both `registry_fonts()` (bundled) and `system_fonts()` (system-installed)
+- Georgia (title font) is NOT bundled — it's a system font pre-installed on most OSes; bundled serifs serve as fallbacks
+- To refresh or update fonts, run `data-raw/download_fonts.R`
 
 ### ggplot2 Integration
 - All plot functions return ggplot objects (composable with `+`)
@@ -192,8 +193,7 @@ Rscript data-raw/create_logo.R
 - Consider adding English alternatives when appropriate
 
 ### Package Load Behavior (R/zzz.R)
-- `.onAttach()` prints a startup message pointing users at `setup_insper_fonts()` / `import_insper_fonts()`
-- Fonts are NOT auto-imported on load — users must call the setup functions explicitly each session
+- `.onLoad()` registers the three bundled font families via `systemfonts::register_font()`; skips any font already present as a system font to avoid conflicts
 
 ### Smart Aesthetic Detection (R/utils.R)
 - Plot functions that accept a `color`/`fill` argument call `detect_aesthetic_type()` to distinguish a mapped variable from a constant color string
@@ -207,7 +207,7 @@ Rscript data-raw/create_logo.R
 ## pkgdown Website Structure
 
 The package website (_pkgdown.yml) organizes functions into categories:
-- **Themes**: Theme functions and font setup utilities
+- **Themes**: Theme functions
 - **Colors and Palettes**: Color access and palette functions
 - **ggplot2 Scales**: Scale functions for continuous/discrete data
 - **Plot Functions**: High-level plotting functions

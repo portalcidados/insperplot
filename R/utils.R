@@ -21,6 +21,17 @@
 #' which provides better font rendering and eliminates DPI issues. Install the
 #' \pkg{ragg} package and set the RStudio backend to AGG for best results.
 #'
+#' @return The file path of the saved plot (invisibly), as returned by
+#'   \code{\link[ggplot2]{ggsave}}.
+#'
+#' @examples
+#' \dontrun{
+#' p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+#'   ggplot2::geom_point() +
+#'   theme_insper()
+#' save_insper_plot(p, tempfile(fileext = ".png"))
+#' }
+#'
 #' @family utilities
 #' @seealso \code{\link[ggplot2]{ggsave}}
 #' @export
@@ -48,13 +59,11 @@ save_insper_plot <- function(
   if (is.null(device) && grepl("\\.png$", filename, ignore.case = TRUE)) {
     if (requireNamespace("ragg", quietly = TRUE)) {
       device <- ragg::agg_png
-      if (interactive()) {
-        message("Using ragg device for high-quality output")
-      }
+      cli::cli_inform("Using {.pkg ragg} device for high-quality output.")
     }
   }
 
-  ggplot2::ggsave(
+  out <- ggplot2::ggsave(
     filename = filename,
     plot = plot,
     width = width,
@@ -66,7 +75,9 @@ save_insper_plot <- function(
     ...
   )
 
-  message("Plot saved: ", filename)
+  cli::cli_inform("Plot saved: {.file {filename}}")
+
+  invisible(out)
 }
 
 #' Format Brazilian Numbers
@@ -133,227 +144,6 @@ format_num_br <- function(
   )
 }
 
-#' Download Insper Fonts from Google Fonts
-#'
-#' Downloads Insper's recommended fonts (Inter, EB Garamond, and Playfair
-#' Display) from Google Fonts. Fonts are saved locally, making them permanently
-#' available across R sessions via the systemfonts registry.
-#'
-#' @param dir Directory to save fonts. Default \code{"~/fonts"} saves fonts
-#'   permanently. Use \code{tempdir()} for session-only use.
-#' @param verbose Logical. If TRUE (default), prints status messages.
-#'
-#' @return Invisibly returns a named logical vector: TRUE for each font that was
-#'   downloaded, FALSE for fonts already installed (skipped).
-#'
-#' @details
-#' Only missing fonts are downloaded. Uses
-#' \code{\link[systemfonts]{get_from_google_fonts}}, which integrates natively
-#' with the ragg rendering pipeline -- no DPI conflicts, no per-session loading.
-#'
-#' After downloading, restart R so new fonts are picked up by the font registry.
-#' Use \code{\link{setup_insper_fonts}} to verify the result.
-#'
-#' @family utilities
-#' @seealso \code{\link{setup_insper_fonts}},
-#'   \code{\link[systemfonts]{get_from_google_fonts}}
-#' @importFrom stats setNames
-#' @export
-#' @examples
-#' \dontrun{
-#' # Download missing Insper fonts (saved permanently to ~/fonts)
-#' import_insper_fonts()
-#'
-#' # Session-only download
-#' import_insper_fonts(dir = tempdir())
-#' }
-import_insper_fonts <- function(dir = "~/fonts", verbose = TRUE) {
-  fonts <- c("Inter", "EB Garamond", "Playfair Display")
-
-  available <- tryCatch(
-    systemfonts::system_fonts()$family,
-    error = function(e) character(0)
-  )
-
-  already_installed <- vapply(
-    fonts,
-    function(f) any(grepl(f, available, ignore.case = TRUE)),
-    logical(1)
-  )
-
-  to_download <- fonts[!already_installed]
-
-  if (length(to_download) == 0) {
-    if (verbose) {
-      cli::cli_alert_success("All Insper fonts are already installed")
-    }
-    return(invisible(setNames(rep(FALSE, length(fonts)), fonts)))
-  }
-
-  if (verbose) {
-    cli::cli_alert_info(
-      "Downloading {length(to_download)} font{?s}: {.val {to_download}}"
-    )
-  }
-
-  downloaded <- setNames(rep(FALSE, length(fonts)), fonts)
-
-  for (font in to_download) {
-    result <- tryCatch(
-      systemfonts::get_from_google_fonts(font, dir = dir),
-      error = function(e) {
-        if (verbose) {
-          cli::cli_alert_danger("Failed to download {.val {font}}: {e$message}")
-        }
-        FALSE
-      }
-    )
-    downloaded[font] <- isTRUE(result)
-    if (verbose && isTRUE(result)) {
-      cli::cli_alert_success("Downloaded {.val {font}}")
-    }
-  }
-
-  if (verbose) {
-    if (any(downloaded)) {
-      cli::cli_alert_info("Fonts saved to {.path {dir}}")
-      cli::cli_alert_info(
-        "Restart R to make new fonts available in the font registry"
-      )
-    } else if (length(to_download) > 0) {
-      cli::cli_alert_warning(
-        "No fonts were downloaded - check your internet connection"
-      )
-    }
-  }
-
-  invisible(downloaded)
-}
-
-
-#' Check Insper Font and Graphics Setup
-#'
-#' Checks whether recommended Insper fonts are available and reports the status
-#' of the ragg graphics device. Use \code{\link{import_insper_fonts}} to
-#' download any missing fonts.
-#'
-#' @param verbose Logical. If TRUE (default), prints a detailed status report.
-#'   Use FALSE to check status silently via the return value.
-#'
-#' @return Invisibly returns a named logical vector indicating which fonts are
-#'   available: Georgia, Inter, EB Garamond, and Playfair Display.
-#'
-#' @details
-#' \strong{Required fonts} (needed for correct rendering):
-#' \itemize{
-#'   \item \strong{Georgia}: System serif font for titles (usually pre-installed)
-#'   \item \strong{Inter}: Sans-serif font for body text (Google Font)
-#' }
-#'
-#' \strong{Optional fallback fonts} (only used when Georgia is unavailable):
-#' \itemize{
-#'   \item \strong{EB Garamond}: Serif title fallback (Google Font)
-#'   \item \strong{Playfair Display}: Serif title alternative (Google Font)
-#' }
-#'
-#' Run \code{import_insper_fonts()} to download any missing fonts. For best
-#' rendering quality, install the \pkg{ragg} package and set the RStudio
-#' graphics backend to AGG.
-#'
-#' @family utilities
-#' @seealso \code{\link{import_insper_fonts}}
-#' @export
-#' @examples
-#' \dontrun{
-#' setup_insper_fonts()
-#' }
-setup_insper_fonts <- function(verbose = TRUE) {
-  available_fonts <- tryCatch(
-    systemfonts::system_fonts()$family,
-    error = function(e) character(0)
-  )
-
-  check <- function(pattern) {
-    length(available_fonts) > 0 &&
-      any(grepl(pattern, available_fonts, ignore.case = TRUE))
-  }
-
-  font_status <- c(
-    "Georgia" = check("Georgia"),
-    "Inter" = check("Inter"),
-    "EB Garamond" = check("EB Garamond|Garamond"),
-    "Playfair Display" = check("Playfair Display|Playfair")
-  )
-
-  if (!verbose) {
-    return(invisible(font_status))
-  }
-
-  # Georgia + Inter are required; EB Garamond + Playfair Display are optional
-  # fallbacks only used when Georgia is unavailable.
-  core_ok <- font_status["Georgia"] && font_status["Inter"]
-
-  has_ragg <- requireNamespace("ragg", quietly = TRUE)
-
-  cli::cli_h2("Insper Font Status")
-
-  font_bullets <- c(
-    if (font_status["Georgia"]) {
-      c("v" = "Georgia (serif, title font) - system font")
-    } else {
-      c("x" = "Georgia (serif) not found - will use fallbacks")
-    },
-    if (font_status["Inter"]) {
-      c("v" = "Inter (sans-serif, body text) available")
-    } else {
-      c("x" = "Inter (sans-serif, body text) not found")
-    },
-    if (font_status["EB Garamond"]) {
-      c("v" = "EB Garamond (serif, title fallback) available")
-    } else {
-      c("!" = "EB Garamond not found (optional)")
-    },
-    if (font_status["Playfair Display"]) {
-      c("v" = "Playfair Display (serif, title fallback) available")
-    } else {
-      c("!" = "Playfair Display not found (optional)")
-    }
-  )
-  cli::cli_bullets(font_bullets)
-  cli::cli_text("")
-
-  if (core_ok) {
-    cli::cli_alert_success(
-      "Core fonts available \u2014 plots will render correctly."
-    )
-    if (!font_status["EB Garamond"] || !font_status["Playfair Display"]) {
-      cli::cli_alert_info(
-        "Optional fallback fonts can be downloaded with {.code import_insper_fonts()}"
-      )
-    }
-  } else {
-    cli::cli_alert_warning(
-      "Core fonts missing \u2014 run {.code import_insper_fonts()} to download."
-    )
-  }
-
-  cli::cli_text("")
-  if (has_ragg) {
-    cli::cli_alert_success("{.pkg ragg} is installed")
-    if (Sys.getenv("RSTUDIO") == "1") {
-      cli::cli_alert_info(
-        "Set RStudio backend to AGG: {.strong Tools > Global Options > General > Graphics > Backend > AGG}"
-      )
-    }
-  } else {
-    cli::cli_alert_warning(
-      "{.pkg ragg} not installed - for best font rendering:"
-    )
-    cli::cli_code("install.packages('ragg')")
-  }
-
-  invisible(font_status)
-}
 
 #' Check if string is a valid color
 #'
@@ -520,35 +310,22 @@ warn_palette_ignored <- function(aesthetic_type, palette, param_name) {
 
 #' Check Whether Insper Fonts Are Available
 #'
-#' Returns \code{TRUE} when the session is interactive and at least one primary
-#' Insper font (Georgia or Inter) is registered in the system font catalogue.
-#' Intended for use with \code{@examplesIf} in package documentation.
+#' Returns \code{TRUE} when the session is interactive. Fonts are always
+#' available because they are bundled with the package and registered
+#' automatically on load. The interactive-only guard prevents examples from
+#' running during \code{R CMD check}, where the graphics device may not
+#' support custom fonts.
 #'
 #' @return Logical scalar.
+#'
+#' @examples
+#' has_insper_fonts()
+#'
 #' @family utilities
 #' @keywords internal
 #' @export
 has_insper_fonts <- function() {
-  # Only run examples in interactive sessions
-  # (fonts may be detected but not work with CMD check's graphics device)
-  if (!interactive()) {
-    return(FALSE)
-  }
-
-  # Check if systemfonts package is available
-  if (!requireNamespace("systemfonts", quietly = TRUE)) {
-    return(FALSE)
-  }
-
-  # Try to detect if primary fonts are available
-  tryCatch(
-    {
-      fonts <- systemfonts::system_fonts()$family
-      # Check for at least one of the primary fonts (Georgia or Inter)
-      any(grepl("Georgia|Inter", fonts, ignore.case = TRUE))
-    },
-    error = function(e) FALSE
-  )
+  interactive()
 }
 
 #' Calculate Relative Luminance of a Color

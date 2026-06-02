@@ -65,20 +65,19 @@ The theme applies Insper's visual identity through:
   \item Consistent spacing and typography hierarchy
 }
 
-**Font Setup:**
+**Fonts:**
 
 The theme uses fonts based on Insper's official template:
 \itemize{
   \item Georgia (serif, system font) for titles - falls back to EB Garamond,
         then Playfair Display
-  \item Inter (sans-serif, Google Font) for body text - falls back to Arial
+  \item Inter (sans-serif) for body text - falls back to Arial
 }
 
-To install or check fonts, see \code{\link{setup_insper_fonts}} and
-\code{\link{import_insper_fonts}}.
-
-If fonts are unavailable, the theme automatically falls back through the
-chain and ultimately to system defaults ("serif" and "sans") without errors.
+Inter, EB Garamond, and Playfair Display are bundled with the package and
+registered automatically when the package is loaded. Georgia is a system
+font available on most operating systems. If any font is unavailable, the
+theme falls back through the chain to system defaults ("serif" / "sans").
 
 The function validates input parameters and will throw an error if invalid
 values are provided for \code{grid} or \code{border} arguments.
@@ -109,6 +108,6 @@ ggplot(mtcars, aes(x = wt, y = mpg)) +
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-\code{\link[ggplot2]{theme_minimal}}, \code{\link[ggplot2]{theme}}, \code{\link{setup_insper_fonts}}, \code{\link{import_insper_fonts}}
+\code{\link[ggplot2]{theme_minimal}}, \code{\link[ggplot2]{theme}}
 }
 \concept{themes}
