@@ -4,7 +4,7 @@
 
 ## Test environments
 
-* local: macOS (darwin) R 4.4.1
+* local: macOS (darwin) R 4.5.1
 * GitHub Actions:
   - macOS-latest (release)
   - windows-latest (release)
@@ -15,6 +15,10 @@
 ## Downstream dependencies
 
 There are currently no downstream dependencies for this package.
+
+## URL notes
+
+* `urlchecker::url_check()` reports 403/404 errors for `https://www.insper.edu.br/` and `https://ourworldindata.org/grapher/global-fossil-fuel-consumption`. Both URLs are valid and accessible in a browser — the servers block automated user agents.
 
 ## Additional notes
 
