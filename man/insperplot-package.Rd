@@ -4,11 +4,11 @@
 \name{insperplot-package}
 \alias{insperplot}
 \alias{insperplot-package}
-\title{insperplot: Insper Themed ggplot2 Extensions}
+\title{insperplot: Insper Themed 'ggplot2' Extensions}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Extends ggplot2 with Insper's identity, providing custom themes, color palettes, and specialized plotting functions for academic and institutional use.
+Extends 'ggplot2' with the visual identity of Insper Instituto de Ensino e Pesquisa, a Brazilian non-profit institution dedicated to teaching and research. Provides custom themes, color palettes, discrete and continuous scales, and high-level plotting functions for producing publication-ready charts with consistent institutional branding. All plot functions return standard 'ggplot2' objects that can be further customized with additional layers.
 
 This package extends ggplot2 with Insper Instituto de Ensino e Pesquisa
 visual identity, providing custom themes, color palettes, and specialized
@@ -135,7 +135,7 @@ Useful links:
 }
 }
 \author{
-\strong{Maintainer}: Vinicius Reginatto \email{viniciusor@insper.edu.br} [copyright holder]
+\strong{Maintainer}: Vinicius Oike \email{viniciusor@insper.edu.br} [copyright holder]
 
 }
 \keyword{internal}
